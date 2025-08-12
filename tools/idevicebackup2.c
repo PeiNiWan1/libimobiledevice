@@ -1955,7 +1955,7 @@ int main(int argc, char *argv[])
 		return 2;
 	}
 
-	if (cmd == CMD_CHANGEPW || cmd == CMD_CLOUD)
+	if (cmd == CMD_CHANGEPW || cmd == CMD_CLOUD || cmd == CMD_ERASE)
 	{
 		backup_directory = (char *)".this_folder_is_not_present_on_purpose";
 	}
