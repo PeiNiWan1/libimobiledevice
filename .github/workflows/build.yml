@@ -252,7 +252,10 @@ jobs:
           cp -r extract/* /
     - uses: actions/checkout@v4
     - name: autogen
-      run: ./autogen.sh CC=gcc CXX=g++ --enable-debug
+      run: ./autogen.sh CC=gcc CXX=g++ --enable-debug --enable-static --disable-shared
+
+    - name: fix pkgconfig for static
+      run: sed -i 's/\.dll\.a/.a/g' /mingw*/lib/pkgconfig/*.pc
     - name: make
       run: make
     - name: make install
