@@ -191,7 +191,7 @@ jobs:
       matrix:
         include: [
           { msystem: MINGW64, arch: x86_64 },
-          { msystem: MINGW32, arch: i686   }
+          { msystem: MINGW32, arch: i686 }
         ]
     steps:
     - uses: msys2/setup-msys2@v2
@@ -209,12 +209,18 @@ jobs:
           libtool
           autoconf
           automake-wrapper
+
     - name: prepare environment
       run: |
-          dest=`echo ${{ matrix.msystem }} |tr [:upper:] [:lower:]`
+          dest=`echo ${{ matrix.msystem }} | tr [:upper:] [:lower:]`
           echo "dest=$dest" >> $GITHUB_ENV
           echo "target_triplet=`gcc -dumpmachine`" >> $GITHUB_ENV
           git config --global core.autocrlf false
+
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
     - name: fetch libplist
       uses: dawidd6/action-download-artifact@v6
       with:
@@ -243,6 +249,7 @@ jobs:
         workflow: build.yml
         name: libtatsu-latest_${{ matrix.arch }}-${{ env.dest }}
         repo: libimobiledevice/libtatsu
+
     - name: install external dependencies
       run: |
           mkdir extract
@@ -250,18 +257,28 @@ jobs:
             tar -C extract -xvf $I
           done
           cp -r extract/* /
-    - uses: actions/checkout@v4
+
+    - name: fix pkgconfig for static
+      run: sed -i 's/\.dll\.a/.a/g' /mingw*/lib/pkgconfig/*.pc
+
     - name: autogen
-      run: ./autogen.sh CC=gcc CXX=g++ --enable-debug --enable-static
+      run: |
+          export PKG_CONFIG="pkg-config --static"
+          export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:/mingw32/lib/pkgconfig
+          ./autogen.sh CC=gcc CXX=g++ --enable-shared --disable-static --enable-debug
+
     - name: make
-      run: make
+      run: make -j$(nproc)
+
     - name: make install
       run: make install
+
     - name: prepare artifact
       run: |
           mkdir -p dest
           DESTDIR=`pwd`/dest make install
           tar -C dest -cf libimobiledevice.tar ${{ env.dest }}
+
     - name: publish artifact
       uses: actions/upload-artifact@v4
       with:
