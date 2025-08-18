@@ -265,7 +265,7 @@ jobs:
       run: |
           export PKG_CONFIG="pkg-config --static"
           export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:/mingw32/lib/pkgconfig
-          ./autogen.sh CC=gcc CXX=g++ --enable-shared --disable-static --enable-debug
+          ./autogen.sh CC=gcc CXX=g++ --enable-shared 
 
     - name: make
       run: make -j$(nproc)
