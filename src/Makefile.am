@@ -62,14 +62,8 @@ libimobiledevice_1_0_la_SOURCES = \
 	bt_packet_logger.c bt_packet_logger.h
 
 if WIN32
-libimobiledevice_1_0_la_LDFLAGS = -no-undefined -avoid-version -static
-libimobiledevice_1_0_la_LIBADD = \
-    $(top_builddir)/common/libinternalcommon.la \
-    /mingw64/lib/libplist-2.0.a \
-    /mingw64/lib/libusbmuxd-2.0.a \
-    /mingw64/lib/libimobiledevice-glue-1.0.a \
-    /mingw64/lib/libcrypto.a \
-    /mingw64/lib/libssl.a
+libimobiledevice_1_0_la_LDFLAGS += -avoid-version -static-libgcc
+libimobiledevice_1_0_la_LIBADD += -lole32 -lws2_32 -lgdi32
 endif
 
 pkgconfigdir = $(libdir)/pkgconfig
